@@ -2,6 +2,8 @@
 let playerMark = 'X';
 let gameMode = 'PvP';
 const cells = document.querySelectorAll('.cell');
+const messageField = document.querySelector('#message-field');
+const restartButton = document.querySelector('#restart-button');
 
 const gameboard = (function() {
     let _board;
@@ -31,32 +33,25 @@ const game = (function() {
     let currentPlayer = 'player1';
     let player1;
     let player2;
+    let moveCounter = 0;
     const _winningCombinations = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
     ]
     
 
     const startNewGame = function() {
-        let winner;
-        let moveCounter = 0;
+        moveCounter = 0;
         gameboard.clear();
         player1 = createPlayer('Player1', 'X');
         player2 = createPlayer('Player2', '0');
         _gameState = 'make_move';
         currentPlayer = 'player1';
-        const _board = gameboard.getBoard();
+        
 
         for (let i = 0; i < 9; i++) {
             cells[i].addEventListener('click', () => {
-                let player;
-                if (currentPlayer == 'player1') {
-                    player = player1; 
-                } else {
-                    player = player2;
-                }
-                if(_gameState !== 'make_move') {
-                    return;
-                }
+                if(_gameState !== 'make_move') return;
+                let player = (currentPlayer == 'player1') ? player1 : player2;
                 
                 if (validateMove(i)) {
                     gameboard.markCell(i, player.mark);
@@ -64,12 +59,11 @@ const game = (function() {
                     moveCounter++;
                     if (checkWinner(player)) {
                         _gameState = 'end_game';
-                        winner = player.name;
-                        console.log(`${winner} is a winner!`);
+                        messageField.textContent = `${player.mark} is a winner!`;
                     }
-                    if (moveCounter === 9 && winner === undefined) {
-                        winner = 'tie';
+                    if (moveCounter === 9 && !checkWinner(player)) {
                         console.log(`It's a tie!`);
+                        messageField.textContent = `It's a tie!`;
                     }
                     changePlayer();
                 }
@@ -109,7 +103,18 @@ const game = (function() {
         }
         
     }
-    return {startNewGame};
+
+    function restartGame() {
+        _gameState = "make_move";
+        moveCounter = 0;
+        gameboard.clear();
+        player1 = createPlayer('Player1', 'X');
+        player2 = createPlayer('Player2', '0');
+        _gameState = 'make_move';
+        currentPlayer = 'player1';
+        _board = gameboard.getBoard();
+    }
+    return {startNewGame, restartGame};
 
 })()
 
@@ -136,4 +141,6 @@ function createPlayer(name, mark) {
 }
 
 game.startNewGame();
+
+restartButton.onclick = game.restartGame();
 
