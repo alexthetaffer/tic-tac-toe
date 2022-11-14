@@ -30,7 +30,6 @@ const gameboard = (function() {
 
 const game = (function() {
     let _gameState = 'new_game';
-    let currentPlayer = 'player1';
     let player1;
     let player2;
     let moveCounter = 0;
@@ -40,42 +39,41 @@ const game = (function() {
     
 
     const startNewGame = function() {
-        moveCounter = 0;
         gameboard.clear();
         player1 = createPlayer('Player1', 'X');
         player2 = createPlayer('Player2', '0');
+        let currentPlayer = player1;
         _gameState = 'make_move';
-        currentPlayer = 'player1';
-        
+
 
         for (let i = 0; i < 9; i++) {
             cells[i].addEventListener('click', () => {
                 if(_gameState !== 'make_move') return;
-                let player = (currentPlayer == 'player1') ? player1 : player2;
+                const nextPlayer = (currentPlayer.name === 'Player1') ? player2 : player1;
+                messageField.textContent = `Player ${nextPlayer.mark}'s turn`;
                 
                 if (validateMove(i)) {
-                    gameboard.markCell(i, player.mark);
+                    gameboard.markCell(i, currentPlayer.mark);
                     displayController.renderBoard();
                     moveCounter++;
-                    if (checkWinner(player)) {
+                    if (checkWinner(currentPlayer)) {
                         _gameState = 'end_game';
-                        messageField.textContent = `${player.mark} is a winner!`;
+                        messageField.textContent = `${currentPlayer.mark} is a winner!`;
                     }
-                    if (moveCounter === 9 && !checkWinner(player)) {
+                    if (moveCounter === 9 && !checkWinner(currentPlayer)) {
                         console.log(`It's a tie!`);
                         messageField.textContent = `It's a tie!`;
                     }
+                    console.log(currentPlayer.name)
                     changePlayer();
+                    console.log(currentPlayer.name)
+
                 }
             });
     }
 
         function changePlayer() {
-            if (currentPlayer === 'player1') {
-                currentPlayer = 'player2';
-            } else {
-                currentPlayer = 'player1';
-            }
+            currentPlayer = (currentPlayer.name == 'Player1') ? player2 : player1;
         }
 
         function validateMove(i) {
