@@ -40,6 +40,7 @@ const game = (function() {
 
     const startNewGame = function() {
         gameboard.clear();
+        _board = gameboard.getBoard();
         player1 = createPlayer('Player1', 'X');
         player2 = createPlayer('Player2', '0');
         let currentPlayer = player1;
@@ -64,13 +65,12 @@ const game = (function() {
                         console.log(`It's a tie!`);
                         messageField.textContent = `It's a tie!`;
                     }
-                    console.log(currentPlayer.name)
                     changePlayer();
-                    console.log(currentPlayer.name)
-
                 }
             });
     }
+
+    restartButton.onclick = restartGame;
 
         function changePlayer() {
             currentPlayer = (currentPlayer.name == 'Player1') ? player2 : player1;
@@ -100,19 +100,18 @@ const game = (function() {
             return false;
         }
         
+        function restartGame() {
+            _gameState = "make_move";
+            moveCounter = 0;
+            currentPlayer = player1;
+            messageField.textContent = `Player ${currentPlayer.mark}'s turn`;
+            gameboard.clear();
+            _board = gameboard.getBoard();
+            displayController.renderBoard();
+        }
     }
 
-    function restartGame() {
-        _gameState = "make_move";
-        moveCounter = 0;
-        gameboard.clear();
-        player1 = createPlayer('Player1', 'X');
-        player2 = createPlayer('Player2', '0');
-        _gameState = 'make_move';
-        currentPlayer = 'player1';
-        _board = gameboard.getBoard();
-    }
-    return {startNewGame, restartGame};
+    return {startNewGame};
 
 })()
 
@@ -139,6 +138,4 @@ function createPlayer(name, mark) {
 }
 
 game.startNewGame();
-
-restartButton.onclick = game.restartGame();
 
