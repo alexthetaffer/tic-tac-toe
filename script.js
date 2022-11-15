@@ -3,7 +3,7 @@ const cells = document.querySelectorAll('.cell');
 const messageField = document.querySelector('#message-field');
 const restartButton = document.querySelector('#restart-button');
 
-const gameboard = (function() {
+const gameboard = (function () {
     let _board;
 
     function clear() {
@@ -26,7 +26,7 @@ const gameboard = (function() {
     }
 })();
 
-const displayController = (function() {
+const displayController = (function () {
 
     function renderBoard() {
         const board = gameboard.getBoard();
@@ -49,12 +49,12 @@ const displayController = (function() {
         })
     }
 
-    return {renderBoard, markFields, unmarkAll};
+    return { renderBoard, markFields, unmarkAll };
 
 })();
 
 
-const game = (function() {
+const game = (function () {
 
     let gameMode = 'easy';
     let _gameState = 'new_game';
@@ -62,10 +62,11 @@ const game = (function() {
     let player2;
     let moveCounter = 0;
     let winningCombination;
+    let playerMark = '0';
     const _winningCombinations = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
     ]
-    
+
     gameboard.clear();
     _board = gameboard.getBoard();
     player1 = createPlayer('Player1', 'X');
@@ -73,13 +74,69 @@ const game = (function() {
     let currentPlayer = player1;
     _gameState = 'make_move';
 
+    if (gameMode !== 'PvP' && playerMark === '0') {
+        makeAiMove();
+    }
+
+    function makeAiMove() {
+        const possibleMoves = [];
+        for (let i = 0; i < 9; i++) {
+            if (validateMove(i)) {
+                possibleMoves.push(i);
+            }
+        }
+        const move = possibleMoves[Math.floor(Math.random() * (possibleMoves.length))];
+        gameboard.markCell(move, currentPlayer.mark);
+        displayController.renderBoard();
+        moveCounter++;
+        if (checkWinner(currentPlayer)) {
+            _gameState = 'end_game';
+            messageField.textContent = `${currentPlayer.mark} is a winner!`;
+            displayController.markFields(winningCombination);
+        }
+        if (moveCounter === 9 && !checkWinner(currentPlayer)) {
+            messageField.textContent = `It's a tie!`;
+            return;
+        }
+        changePlayer();
+
+    }
+
+    function changePlayer() {
+        currentPlayer = (currentPlayer.name == 'Player1') ? player2 : player1;
+    }
+
+    function validateMove(i) {
+        if (_board[i] === '') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function checkWinner(player) {
+        const board = gameboard.getBoard();
+        const mark = player.mark;
+
+        for (let i = 0; i < _winningCombinations.length; i++) {
+            const comb = _winningCombinations[i];
+            if (board[comb[0]] == mark
+                && board[comb[1]] == mark
+                && board[comb[2]] == mark) {
+                winningCombination = comb;
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     for (let i = 0; i < 9; i++) {
         cells[i].addEventListener('click', () => {
-            if(_gameState !== 'make_move') return;
+            if (_gameState !== 'make_move') return;
             const nextPlayer = (currentPlayer.name === 'Player1') ? player2 : player1;
             messageField.textContent = `Player ${nextPlayer.mark}'s turn`;
-            
+
             if (validateMove(i)) {
                 gameboard.markCell(i, currentPlayer.mark);
                 displayController.renderBoard();
@@ -91,7 +148,6 @@ const game = (function() {
                     return;
                 }
                 if (moveCounter === 9 && !checkWinner(currentPlayer)) {
-                    console.log(`It's a tie!`);
                     messageField.textContent = `It's a tie!`;
                     return;
                 }
@@ -100,63 +156,8 @@ const game = (function() {
             }
         });
 
-    restartButton.onclick = restartGame;
+        restartButton.onclick = restartGame;
 
-        function makeAiMove() {
-            const possibleMoves = [];
-            for (let i = 0; i < 9; i++) {
-                if (validateMove(i)) {
-                    possibleMoves.push(i);
-                }
-            }
-            console.log(`possibleMoves: ${possibleMoves}`);
-            const move = possibleMoves[Math.floor(Math.random() * (possibleMoves.length))];
-            gameboard.markCell(move, currentPlayer.mark);
-            displayController.renderBoard();
-            moveCounter++;
-            if (checkWinner(currentPlayer)) {
-                _gameState = 'end_game';
-                messageField.textContent = `${currentPlayer.mark} is a winner!`;
-                displayController.markFields(winningCombination);
-            }
-            if (moveCounter === 9 && !checkWinner(currentPlayer)) {
-                console.log(`It's a tie!`);
-                messageField.textContent = `It's a tie!`;
-                return;
-            }
-            changePlayer();
-
-        }
-
-        function changePlayer() {
-            currentPlayer = (currentPlayer.name == 'Player1') ? player2 : player1;
-        }
-
-        function validateMove(i) {
-            console.log(_board[i])
-            if (_board[i] === '') {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        function checkWinner(player) {
-            const board = gameboard.getBoard();
-            const mark = player.mark;
-
-            for (let i = 0; i < _winningCombinations.length; i++) {
-                const comb = _winningCombinations[i];
-                if (board[comb[0]] == mark
-                    && board[comb[1]] == mark
-                    && board[comb[2]] == mark) {
-                        winningCombination = comb;
-                        return true;
-                    }
-            }
-            return false;
-        }
-        
         function restartGame() {
             _gameState = "make_move";
             moveCounter = 0;
@@ -166,6 +167,9 @@ const game = (function() {
             _board = gameboard.getBoard();
             displayController.renderBoard();
             displayController.unmarkAll();
+            if (gameMode !== 'PvP' && playerMark === '0') {
+                makeAiMove();
+            }
         }
     }
 
@@ -175,6 +179,6 @@ function createPlayer(name, mark) {
     mark: mark;
     name: name;
 
-    return {mark, name};
-    
+    return { mark, name };
+
 }
