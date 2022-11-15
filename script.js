@@ -33,6 +33,7 @@ const game = (function() {
     let player1;
     let player2;
     let moveCounter = 0;
+    let winningCombination;
     const _winningCombinations = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
     ]
@@ -60,6 +61,7 @@ const game = (function() {
                     if (checkWinner(currentPlayer)) {
                         _gameState = 'end_game';
                         messageField.textContent = `${currentPlayer.mark} is a winner!`;
+                        displayController.markFields(winningCombination);
                     }
                     if (moveCounter === 9 && !checkWinner(currentPlayer)) {
                         console.log(`It's a tie!`);
@@ -94,6 +96,7 @@ const game = (function() {
                 if (board[comb[0]] == mark
                     && board[comb[1]] == mark
                     && board[comb[2]] == mark) {
+                        winningCombination = comb;
                         return true;
                     }
             }
@@ -108,6 +111,7 @@ const game = (function() {
             gameboard.clear();
             _board = gameboard.getBoard();
             displayController.renderBoard();
+            displayController.unmarkAll();
         }
     }
 
@@ -124,7 +128,21 @@ const displayController = (function() {
         }
     };
 
-    return {renderBoard};
+    function markFields(fields) {
+        fields.forEach(field => {
+            cells[field].style.backgroundColor = '#555';
+            cells[field].style.color = 'white';
+        });
+    }
+
+    function unmarkAll() {
+        cells.forEach(cell => {
+            cell.style.backgroundColor = 'white';
+            cell.style.color = 'var(--mark-color)';
+        })
+    }
+
+    return {renderBoard, markFields, unmarkAll};
 
 })();
 
@@ -138,4 +156,3 @@ function createPlayer(name, mark) {
 }
 
 game.startNewGame();
-
