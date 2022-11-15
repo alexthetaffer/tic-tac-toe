@@ -6,7 +6,7 @@
 }
 
 :root {
-    font-family: 'roboto', sans-serif;
+    font-family: 'montserrat', sans-serif;
     --mark-color: #333;
 }
 
@@ -22,7 +22,8 @@ body {
 
 .playfield {
     background-color: var(--mark-color);
-    gap: 6px;
+    gap: 4px;
+    font-weight: 600;
     width: 400px;
     height: 400px;
     display: grid;
@@ -36,6 +37,7 @@ body {
     align-items: center;
     justify-content: center;
     background-color: white;
+    color: var(--mark-color);
 }
 
 /* Navigation */
