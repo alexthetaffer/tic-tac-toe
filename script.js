@@ -56,7 +56,7 @@ const displayController = (function() {
 
 const game = (function() {
 
-    let gameMode = 'PvP';
+    let gameMode = 'easy';
     let _gameState = 'new_game';
     let player1;
     let player2;
@@ -69,7 +69,7 @@ const game = (function() {
     gameboard.clear();
     _board = gameboard.getBoard();
     player1 = createPlayer('Player1', 'X');
-    player2 = createPlayer('Player2', '0');
+    player2 = createPlayer('Player2', 'O');
     let currentPlayer = player1;
     _gameState = 'make_move';
 
@@ -88,16 +88,45 @@ const game = (function() {
                     _gameState = 'end_game';
                     messageField.textContent = `${currentPlayer.mark} is a winner!`;
                     displayController.markFields(winningCombination);
+                    return;
                 }
                 if (moveCounter === 9 && !checkWinner(currentPlayer)) {
                     console.log(`It's a tie!`);
                     messageField.textContent = `It's a tie!`;
+                    return;
                 }
                 changePlayer();
+                if (gameMode !== "PvP") makeAiMove();
             }
         });
 
     restartButton.onclick = restartGame;
+
+        function makeAiMove() {
+            const possibleMoves = [];
+            for (let i = 0; i < 9; i++) {
+                if (validateMove(i)) {
+                    possibleMoves.push(i);
+                }
+            }
+            console.log(`possibleMoves: ${possibleMoves}`);
+            const move = possibleMoves[Math.floor(Math.random() * (possibleMoves.length))];
+            gameboard.markCell(move, currentPlayer.mark);
+            displayController.renderBoard();
+            moveCounter++;
+            if (checkWinner(currentPlayer)) {
+                _gameState = 'end_game';
+                messageField.textContent = `${currentPlayer.mark} is a winner!`;
+                displayController.markFields(winningCombination);
+            }
+            if (moveCounter === 9 && !checkWinner(currentPlayer)) {
+                console.log(`It's a tie!`);
+                messageField.textContent = `It's a tie!`;
+                return;
+            }
+            changePlayer();
+
+        }
 
         function changePlayer() {
             currentPlayer = (currentPlayer.name == 'Player1') ? player2 : player1;
