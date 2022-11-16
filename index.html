@@ -14,21 +14,30 @@
 </head>
 
 <body>
-    <p id="message-field">Player X's turn</p>
-
-    <div class="playfield">
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-    </div>
-
-    <button id="restart-button">Restart</button>
+    <select id="gameMode">
+        <option value="simpleAi">Simple AI</option>
+        <option value="PvP">PvP</option>
+        <!-- <option value="advancedAi">Advanced AI</option> -->
+    </select>
+    <main>
+        <div class="buttons">
+            <button class="active" id="play-as-x-button">X</button>
+            <button id="play-as-0-button">O</button>
+        </div>
+        <p id="message-field">Player X's turn</p>
+        <div class="playfield">
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+        <button id="restart-button">Restart</button>
+    </main>
 
 </body>
 
