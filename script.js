@@ -4,6 +4,8 @@ const messageField = document.querySelector('#message-field');
 const restartButton = document.querySelector('#restart-button');
 const playAsXButton = document.querySelector('#play-as-x-button');
 const playAs0Button = document.querySelector('#play-as-0-button');
+const playerMarkButtons = document.querySelector('.buttons');
+const gameModeSelector = document.querySelector('#gameModeSelector');
 
 const gameboard = (function () {
     let _board;
@@ -56,10 +58,10 @@ const displayController = (function () {
 
 const game = (function () {
 
-    let gameMode = 'easy';
+    let gameMode = 'simpleAI';
     let _gameState = 'new_game';
-    let player1;
-    let player2;
+    let player1 = createPlayer('Player1', 'X');
+    let player2 = createPlayer('Player2', 'O');
     let moveCounter = 0;
     let winningCombination;
     let playerMark = 'X';
@@ -67,15 +69,28 @@ const game = (function () {
         [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
     ]
 
-    gameboard.clear();
-    _board = gameboard.getBoard();
-    player1 = createPlayer('Player1', 'X');
-    player2 = createPlayer('Player2', 'O');
-    let currentPlayer = player1;
-    _gameState = 'make_move';
+    restartGame();
 
     if (gameMode !== 'PvP' && playerMark === '0') {
         makeAiMove();
+    }
+
+    function restartGame() {
+        _gameState = "make_move";
+        moveCounter = 0;
+        currentPlayer = player1;
+        messageField.textContent = `Player ${currentPlayer.mark}'s turn`;
+        gameboard.clear();
+        _board = gameboard.getBoard();
+        displayController.renderBoard();
+        displayController.unmarkAll();
+        if (gameMode !== 'PvP' && playerMark === '0') {
+            makeAiMove();
+        }
+        if (gameMode !== 'PvP') {
+            messageField.textContent = `Make a move`;
+
+        }
     }
 
     function makeAiMove() {
@@ -135,7 +150,9 @@ const game = (function () {
         cells[i].addEventListener('click', () => {
             if (_gameState !== 'make_move') return;
             const nextPlayer = (currentPlayer.name === 'Player1') ? player2 : player1;
-            messageField.textContent = `Player ${nextPlayer.mark}'s turn`;
+            if (gameMode === 'PvP') {
+                messageField.textContent = `Player ${nextPlayer.mark}'s turn`;
+            }
 
             if (validateMove(i)) {
                 gameboard.markCell(i, currentPlayer.mark);
@@ -171,19 +188,16 @@ const game = (function () {
             playAsXButton.classList.remove('active');
             restartGame();
         })
-
-        function restartGame() {
-            _gameState = "make_move";
-            moveCounter = 0;
-            currentPlayer = player1;
-            messageField.textContent = `Player ${currentPlayer.mark}'s turn`;
-            gameboard.clear();
-            _board = gameboard.getBoard();
-            displayController.renderBoard();
-            displayController.unmarkAll();
-            if (gameMode !== 'PvP' && playerMark === '0') {
-                makeAiMove();
-            }
+        gameModeSelector.onchange = function() {
+            if (gameModeSelector.value === 'PvP') {
+                gameMode = 'PvP';
+                playerMarkButtons.style.visibility = 'hidden';
+                restartGame();
+            } else if (gameModeSelector.value === 'simpleAI') {
+                gameMode = 'simpleAI';
+                playerMarkButtons.style.visibility = 'visible';
+                restartGame();
+            };
         }
     }
 
