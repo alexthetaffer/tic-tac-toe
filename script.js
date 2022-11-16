@@ -2,6 +2,8 @@
 const cells = document.querySelectorAll('.cell');
 const messageField = document.querySelector('#message-field');
 const restartButton = document.querySelector('#restart-button');
+const playAsXButton = document.querySelector('#play-as-x-button');
+const playAs0Button = document.querySelector('#play-as-0-button');
 
 const gameboard = (function () {
     let _board;
@@ -155,6 +157,20 @@ const game = (function () {
         });
 
         restartButton.onclick = restartGame;
+        playAsXButton.addEventListener('click', () => {
+            if(playerMark === 'X') return;
+            playerMark = 'X';
+            playAsXButton.classList.add('active');
+            playAs0Button.classList.remove('active');
+            restartGame();
+        })
+        playAs0Button.addEventListener('click', () => {
+            if(playerMark === '0') return;
+            playerMark = '0';
+            playAs0Button.classList.add('active');
+            playAsXButton.classList.remove('active');
+            restartGame();
+        })
 
         function restartGame() {
             _gameState = "make_move";
