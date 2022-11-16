@@ -45,6 +45,8 @@ main {
     justify-content: center;
     background-color: white;
     color: var(--mark-color);
+
+    transition: all 0.3s ease-in;
 }
 
 /* Navigation */
